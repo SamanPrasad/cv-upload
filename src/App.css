@@ -1,0 +1,42 @@
+.full-height {
+  height: 100vh;
+}
+
+.label-width {
+  width: 8em;
+}
+
+.cv-anchor {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cv-list-item {
+  border-radius: 20px;
+}
+
+.cv-td {
+  width: 20%;
+}
+
+.cv-list-input {
+  width: 2em;
+}
+
+.cv-detail-item {
+  width: 100%;
+  height: 100%;
+  border: 1px solid;
+  border-radius: 10px;
+  border-color: rgba(128, 128, 128, 0.13);
+}
+
+.cv-divider {
+  width: 100%;
+  border: 1px solid rgba(63, 63, 63, 0.144);
+}
+
+.cv-modal-position {
+  position: absolute;
+  transform: translateX(50vh), translateY(50vw);
+}
