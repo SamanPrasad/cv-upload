@@ -52,7 +52,7 @@ function CandidateList({ candidates }: Props) {
 
   //Update number of questions
   const updateNumberOfQuestions = (
-    candidate: Candidate,
+    candidateId: number,
     index: number,
     event: MouseEvent
   ) => {
@@ -77,10 +77,10 @@ function CandidateList({ candidates }: Props) {
         questionNumberObj.disabled as boolean;
     }
 
-    const data = JSON.stringify({
-      id: candidate.id,
+    const data = {
+      id: candidateId,
       number: refInputs[index].refInput.current?.value,
-    });
+    };
 
     //send request
     !initialDisableStatus &&
@@ -127,11 +127,10 @@ function CandidateList({ candidates }: Props) {
                   type="button"
                   className="btn btn-outline-primary mx-1 ms-2 py-0"
                   onClick={(event) =>
-                    updateNumberOfQuestions(item, index, event)
+                    updateNumberOfQuestions(item.id, index, event)
                   }
                 >
                   {refInputs[index].disabled ? "Edit" : "Update"}
-                  Test
                 </button>
               </td>
               <td>

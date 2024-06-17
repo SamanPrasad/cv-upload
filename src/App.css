@@ -40,3 +40,14 @@
   position: absolute;
   transform: translateX(50vh), translateY(50vw);
 }
+
+.cv-link-hover:hover {
+  color: white !important;
+}
+
+.cv-response-message {
+  display: none;
+}
+.cv-response-message.cv-show {
+  display: block;
+}

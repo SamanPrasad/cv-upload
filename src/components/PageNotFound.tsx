@@ -1,4 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 function PageNotFound() {
+  const redirect = useNavigate();
+
+  const goToHomePage = () => {
+    redirect("/");
+  };
   return (
     <div>
       <section className="py-3 py-md-5 min-vh-100 d-flex justify-content-center align-items-center">
@@ -17,8 +24,8 @@ function PageNotFound() {
                 </p>
                 <a
                   className="btn btn-dark rounded-pill px-5 fs-6 m-0"
-                  href="#!"
                   role="button"
+                  onClick={goToHomePage}
                 >
                   Back to Home
                 </a>
