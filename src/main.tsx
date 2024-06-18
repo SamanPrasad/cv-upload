@@ -34,14 +34,15 @@ const router = createBrowserRouter([
     path: "/list",
     element: <ListView />,
   },
-  {
-    path: "/page-not-found",
-    element: <PageNotFound />,
-  },
+
   {
     path: "/view/:userId",
     element: <Candidate />,
     loader: validateUserId,
+  },
+  {
+    path: "/page-not-found",
+    element: <PageNotFound />,
   },
 ]);
 

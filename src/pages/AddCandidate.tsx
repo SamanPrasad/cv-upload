@@ -1,61 +1,30 @@
 import axios from "axios";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+//interfaces
+interface Stack {
+  id: number;
+  name: string;
+}
+
+interface Position {
+  id: number;
+  position: string;
+}
+
 function AddCandidate() {
-  //interfaces
-  interface Stack {
-    id: number;
-    name: string;
-  }
-
-  interface Position {
-    id: number;
-    position: string;
-  }
-
-  //input data
-  const refName = useRef<HTMLInputElement>(null);
-  const refEmail = useRef<HTMLInputElement>(null);
-  const refStack = useRef<HTMLSelectElement>(null);
-  const refPosition = useRef<HTMLSelectElement>(null);
-  const refCv = useRef<HTMLInputElement>(null);
-
   const [stacksList, setStacksList] = useState<Stack[]>([]);
   const [positionList, setPositionList] = useState<Position[]>([]);
 
+  const [isUploadFailed, setIsUploadFailed] = useState(false);
+
   //redirecting
   const navigate = useNavigate();
-
-  //Handle submit
-  const createCandidate = (event: FormEvent) => {
-    event.preventDefault();
-    let formData = new FormData();
-    if (refName.current) {
-      formData.append("name", refName.current.value);
-    }
-    if (refEmail.current) {
-      formData.append("email", refEmail.current.value);
-    }
-    if (refStack.current) {
-      formData.append("stack", refStack.current.value);
-    }
-    if (refPosition.current) {
-      formData.append("position", refPosition.current.value);
-    }
-    if (refCv.current && refCv.current.files) {
-      formData.append("file", refCv.current.files[0]);
-    }
-
-    console.log(formData);
-    axios.post(import.meta.env.VITE_TEST_API + "/create", formData).then(() => {
-      navigate("/list");
-    });
-  };
 
   //fetch stacks list
   useEffect(() => {
@@ -83,15 +52,19 @@ function AddCandidate() {
 
   //validate form
   const schema = z.object({
-    name: z.string().nonempty("Name cannot be empty"),
-    email: z.string().nonempty("E-Mail cannot be empty"),
-    stack: z.string().nonempty("Stack cannot be empty"),
-    position: z.string().nonempty("Stack cannot be empty"),
-    cv: z.object({
-      name: z.string().min(1, "erro errorrr"), // Ensure the filename is not empty
-      type: z.string().regex(/pdf$/), // Validate that the file type is PDF
-      size: z.number().max(5242880), // Limit the file size to 5MB (5242880 bytes)
-    }),
+    name: z.string().min(1, "Please enter a name"),
+    email: z.string().email("Please enter a valid email"),
+    stack: z.string().min(1, "Please choose a stack"),
+    position: z.string().min(1, "Please choose a position"),
+    file: z
+      .instanceof(FileList)
+      .refine((files) => files.length == 1, {
+        message: "Please upload a file",
+      })
+      .refine((files) => "application/pdf" == files[0]?.type, {
+        message:
+          "File type not supported. Please upload a JPEG, PNG, or PDF file.",
+      }),
   });
 
   type FormData = z.infer<typeof schema>;
@@ -102,7 +75,27 @@ function AddCandidate() {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  const test = (data: FormData) => console.log(data);
+  //Submit form
+  const submitCandidate = (data: FormData) => {
+    let formData = new FormData();
+
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("stack", data.stack);
+    formData.append("position", data.position);
+    formData.append("file", data.file[0]);
+
+    axios
+      .post(import.meta.env.VITE_TEST_API + "/create", formData)
+      .then((res) => {
+        navigate("/list");
+      })
+      .catch((err) => {
+        console.log(err.message);
+        setIsUploadFailed(true);
+      });
+  };
+
   //return component
   return (
     <MainLayout>
@@ -110,13 +103,12 @@ function AddCandidate() {
         <div className="row justify-content-center">
           <div className="col-8">
             <h1 className="my-5 text-center display-2">CV Upload</h1>
-            <form onSubmit={handleSubmit(test)}>
-              <div className="input-group mb-3">
+            <form onSubmit={handleSubmit(submitCandidate)}>
+              <div className="input-group">
                 <label htmlFor="name" className="input-group-text label-width">
                   Full Name
                 </label>
                 <input
-                  // ref={refName}
                   {...register("name")}
                   type="text"
                   className="form-control"
@@ -124,34 +116,36 @@ function AddCandidate() {
                   aria-label="name"
                   aria-describedby="basic-addon1"
                   id="name"
-                  name="name"
                 />
-                {errors.name && <p>Error Name</p>}
               </div>
-              <div className="input-group mb-3">
+              <div className="cv-error-message mt-0 px-2">
+                {errors.name && <p>{errors.name.message}</p>}
+              </div>
+              <div className="input-group mt-3">
                 <label htmlFor="email" className="input-group-text label-width">
                   E-mail
                 </label>
                 <input
-                  ref={refEmail}
+                  {...register("email")}
                   type="text"
                   className="form-control"
                   placeholder="John@example.com"
                   aria-label="email"
                   aria-describedby="basic-addon1"
                   id="email"
-                  name="email"
                 />
               </div>
-              <div className="input-group mb-3">
+              <div className="cv-error-message mt-0 px-2">
+                {errors.email && <p>{errors.email.message}</p>}
+              </div>
+              <div className="input-group mt-3">
                 <label className="input-group-text label-width" htmlFor="stack">
                   Stack
                 </label>
                 <select
-                  ref={refStack}
+                  {...register("stack")}
                   className="form-select"
                   id="stack"
-                  name="stack"
                   defaultValue=""
                 >
                   <option value="">Choose...</option>
@@ -162,7 +156,10 @@ function AddCandidate() {
                   ))}
                 </select>
               </div>
-              <div className="input-group mb-3">
+              <div className="cv-error-message mt-0 px-2">
+                {errors.stack && <p>{errors.stack.message}</p>}
+              </div>
+              <div className="input-group mt-3">
                 <label
                   className="input-group-text label-width"
                   htmlFor="position"
@@ -170,10 +167,9 @@ function AddCandidate() {
                   Position
                 </label>
                 <select
-                  ref={refPosition}
+                  {...register("position")}
                   className="form-select"
                   id="position"
-                  name="position"
                   defaultValue=""
                 >
                   <option value="">Choose...</option>
@@ -184,30 +180,35 @@ function AddCandidate() {
                   ))}
                 </select>
               </div>
-              <div className="input-group mb-3">
+              <div className="cv-error-message mt-0 px-2">
+                {errors.position && <p>{errors.position.message}</p>}
+              </div>
+              <div className="input-group mt-3">
                 <label className="input-group-text label-width" htmlFor="cv">
                   Upload CV
                 </label>
                 <input
                   accept="application/pdf"
-                  ref={refCv}
                   type="file"
                   className="form-control"
                   id="cv"
-                  name="cv"
+                  {...register("file")}
                 />
-                {errors.cv && <p>{errors.cv.message}</p>}
               </div>
-              <div className="input-group justify-content-center">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="submit"
-                  // onClick={createCandidate}
-                >
+              <div className="cv-error-message mt-0 px-2 pb-0 mb-0">
+                {errors.file && <p>{errors.file.message}</p>}
+              </div>
+              <div className="input-group justify-content-center mt-3">
+                <button className="btn btn-outline-secondary" type="submit">
                   Create Candidate
                 </button>
               </div>
             </form>
+            <div className="cv-error-message text-center mt-0 p-2">
+              {isUploadFailed && (
+                <p className="h3">Something went wrong. Please Try Again !</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
