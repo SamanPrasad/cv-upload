@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import CandidateList from "../components/CandidateList";
+import Table from "../components/candidate-list/Table";
 import { useEffect, useState } from "react";
 import axios from "axios";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,18 +8,18 @@ import Paginator from "../components/Paginator";
 import MainLayout from "../layouts/MainLayout";
 
 interface Candidate {
-  id: number;
+  id: string;
   name: string;
   email: string;
   url: string;
   no_of_questions: number;
 }
 
-function ListView() {
+function CandidateListPage() {
   //state
   const [activePage, setActivePage] = useState(1);
   const [candidatesList, setCandidatesList] = useState<Candidate[]>([]);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   //get candidates
   const getCandidates = () => {
@@ -54,7 +54,7 @@ function ListView() {
             <h1 className="my-5 text-center display-2">List of Candidates</h1>
             <div className="row justify-content-center">
               <div className="col-8">
-                <CandidateList candidates={candidates} />
+                <Table candidates={candidates} />
                 <div className="d-flex justify-content-center">
                   <Paginator
                     activePage={activePage}
@@ -72,4 +72,4 @@ function ListView() {
   );
 }
 
-export default ListView;
+export default CandidateListPage;

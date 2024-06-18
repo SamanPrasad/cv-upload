@@ -14,9 +14,10 @@ interface Props {
     startTime: string;
     status: string;
   };
+  candidateId: string;
 }
 
-function InterviewStatus({ interviewDetails }: Props) {
+function InterviewStatus({ interviewDetails, candidateId }: Props) {
   //States
   const { status, setStatus } = useContext(CandidateContext);
 
@@ -138,11 +139,13 @@ function InterviewStatus({ interviewDetails }: Props) {
     </div>
   );
 
+  console.log("canid", interviewDetails);
+
   return (
     <div style={{ position: "relative" }} className="p-0">
       <div style={{ position: "absolute", width: "100%" }}>
         <ScheduleInterviewModal
-          candidateId={interviewDetails.candidateId}
+          candidateId={candidateId}
           modalId="scheduleModal"
         />
       </div>

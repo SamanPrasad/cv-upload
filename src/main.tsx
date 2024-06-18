@@ -10,9 +10,10 @@ import {
   redirect,
 } from "react-router-dom";
 import AddCandidate from "./pages/AddCandidate.tsx";
-import ListView from "./pages/ListView.tsx";
+import CandidateListPage from "./pages/CandidateListPage.tsx";
 import Candidate from "./pages/Candidate.tsx";
 import PageNotFound from "./components/PageNotFound.tsx";
+import Test from "./components/Test.tsx";
 
 const validateUserId = async ({ params }: LoaderFunctionArgs) => {
   const userId = Number(params.userId);
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/list",
-    element: <ListView />,
+    element: <CandidateListPage />,
   },
 
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: "/page-not-found",
     element: <PageNotFound />,
+  },
+  {
+    path: "/test",
+    element: <Test />,
   },
 ]);
 

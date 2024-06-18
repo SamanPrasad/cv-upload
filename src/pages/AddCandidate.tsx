@@ -84,6 +84,7 @@ function AddCandidate() {
     formData.append("stack", data.stack);
     formData.append("position", data.position);
     formData.append("file", data.file[0]);
+    console.log(formData);
 
     axios
       .post(import.meta.env.VITE_TEST_API + "/create", formData)

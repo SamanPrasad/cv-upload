@@ -5,7 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import CandidateDetails from "../components/CandidateDetails";
 import InterviewStatus from "../components/interview/InterviewStatus";
-import InterviewQuestions from "../components/interview/InterviewQuestions";
+import InterviewQuestionsTable from "../components/interview/InterviewQuestionsTable";
+import Paginator from "../components/Paginator";
 
 interface ContextInterface {
   status: boolean;
@@ -13,7 +14,7 @@ interface ContextInterface {
 }
 
 interface UserDetails {
-  userId: number;
+  userId: string;
   candidateName: string;
   email: string;
   stack: string;
@@ -44,6 +45,7 @@ export const CandidateContext = React.createContext<ContextInterface>(
 function Candidate() {
   const { userId } = useParams();
   const redirect = useNavigate();
+  const [activePage, setActivePage] = useState(1);
   // const [component, setComponent] = useState<ReactElement>();
   const [status, setStatus] = useState(false); //Used for re-fetching data once the schedule is done
 
@@ -51,7 +53,7 @@ function Candidate() {
   const [interviewDetails, setInterviewDetails] = useState(
     {} as InterviewDetails
   );
-  const [questions, setQuestions] = useState([] as Questions[]);
+  const [questionsList, setQuestionsList] = useState([] as Questions[]);
   // console.log("interview details ", interviewDetails);
   // const temp = (
   //   <SingleView
@@ -62,7 +64,7 @@ function Candidate() {
   // );
 
   //Delete Candidate
-  const deleteCandidate = (candidateId: number) => {
+  const deleteCandidate = (candidateId: string) => {
     axios
       .delete(
         import.meta.env.VITE_TEST_API + "/candidate/delete/" + candidateId
@@ -88,7 +90,7 @@ function Candidate() {
         // setComponent(element);
         setUserDetails(res.data.success.data.userDetails);
         setInterviewDetails(res.data.success.data.interviewDetails);
-        setQuestions(res.data.success.data.questions);
+        setQuestionsList(res.data.success.data.questions);
         console.log(res.data.success.message);
         // console.log("rendered", res.data.success.data.interviewDetails);
       })
@@ -99,6 +101,18 @@ function Candidate() {
       });
   }, [status]);
 
+  //pagination
+  const range = 3;
+  const startingValue = (activePage - 1) * range;
+  const endingValue = startingValue + range;
+  const questions = questionsList?.slice(startingValue, endingValue);
+  console.log("questions", questions);
+
+  //Generate pagination data
+  const onPageClick = (page: number) => {
+    setActivePage(page);
+  };
+
   return (
     Object.keys(userDetails).length != 0 && (
       <MainLayout>
@@ -106,14 +120,23 @@ function Candidate() {
           {/* <div>{component}</div> */}
           <div className="container">
             <CandidateDetails candidateDetails={userDetails} />
-            <InterviewStatus interviewDetails={interviewDetails} />
-            <InterviewQuestions questions={questions} />
-            {/* <Paginator
-        activePage={activePage}
-        itemsCount={candidatesList?.length}
-        range={range}
-        onPageClick={onPageClick}
-      /> */}
+            <InterviewStatus
+              interviewDetails={interviewDetails}
+              candidateId={userDetails.userId}
+            />
+            <InterviewQuestionsTable questions={questions} />
+            {questions.length > 0 && (
+              <div className="row justify-content-center">
+                <div className="col-8 d-flex justify-content-center">
+                  <Paginator
+                    activePage={activePage}
+                    itemsCount={questionsList?.length}
+                    range={range}
+                    onPageClick={onPageClick}
+                  />
+                </div>
+              </div>
+            )}
             <div className="row justify-content-center my-5">
               <button
                 type="button"

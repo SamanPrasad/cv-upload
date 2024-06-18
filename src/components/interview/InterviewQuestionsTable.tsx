@@ -1,3 +1,5 @@
+import Row from "./Row";
+
 interface Props {
   questions: {
     id: number;
@@ -7,7 +9,7 @@ interface Props {
     isCorrect: string;
   }[];
 }
-function InterviewQuestions({ questions }: Props) {
+function InterviewQuestionsTable({ questions }: Props) {
   return (
     <div className="container mt-3">
       <div className="row justify-content-center">
@@ -34,13 +36,8 @@ function InterviewQuestions({ questions }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {questions.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.id}</td>
-                      <td>{item.question}</td>
-                      <td>{item.answer}</td>
-                      <td>{item.candidateAnswer}</td>
-                    </tr>
+                  {questions.map((item, index) => (
+                    <Row question={item} key={index} />
                   ))}
                 </tbody>
               </table>
@@ -52,4 +49,4 @@ function InterviewQuestions({ questions }: Props) {
   );
 }
 
-export default InterviewQuestions;
+export default InterviewQuestionsTable;

@@ -1,6 +1,6 @@
 interface Props {
   candidateDetails: {
-    userId: number;
+    userId: string;
     candidateName: string;
     email: string;
     stack: string;

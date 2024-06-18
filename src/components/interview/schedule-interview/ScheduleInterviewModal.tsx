@@ -8,6 +8,7 @@ interface Props {
 }
 
 function ScheduleInterviewModal({ modalId, candidateId }: Props) {
+  console.log("can", candidateId);
   const refDateTime = useRef<HTMLInputElement>(null);
   const [cssClass, setCssClass] = useState("");
   let scheduledDateTime: string = "";

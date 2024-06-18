@@ -21,6 +21,7 @@ function Paginator({ activePage, itemsCount, range, onPageClick }: Props) {
       </Pagination.Item>
     );
   }
+  console.log("items", items);
   return (
     <div>
       <Pagination size="sm">
