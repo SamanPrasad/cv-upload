@@ -2,7 +2,7 @@ import Row from "./Row";
 
 interface Props {
   candidates: {
-    id: string;
+    _id: string;
     name: string;
     email: string;
     url: string;

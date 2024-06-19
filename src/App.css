@@ -36,11 +36,6 @@
   border: 1px solid rgba(63, 63, 63, 0.144);
 }
 
-.cv-modal-position {
-  position: absolute;
-  transform: translateX(50vh), translateY(50vw);
-}
-
 .cv-link-hover:hover {
   color: white !important;
 }
@@ -54,4 +49,10 @@
 
 .cv-error-message {
   color: rgba(255, 0, 0, 0.774);
+}
+
+.cv-schedule-modal{
+  position: fixed;
+  left:50%;
+  transform: translateX(-50%);
 }

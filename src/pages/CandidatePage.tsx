@@ -1,29 +1,30 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import SingleView from "../components/SingleView";
 import MainLayout from "../layouts/MainLayout";
 import CandidateDetails from "../components/CandidateDetails";
-import InterviewStatus from "../components/interview/InterviewStatus";
-import InterviewQuestionsTable from "../components/interview/InterviewQuestionsTable";
+import InterviewDetails from "../components/Interview/InterviewDetails";
 import Paginator from "../components/Paginator";
+import InterviewQuestionsTable from "../components/Interview/InterviewDetails/InterviewQuestions/InterviewQuestionsTable";
+import ScheduleInterviewModal from "../components/Interview/InterviewDetails/ScheduleInterview/ScheduleInterviewModal";
 
 interface ContextInterface {
-  status: boolean;
-  setStatus: (val: boolean) => void;
+  getCandidateDetails: () => void;
+  setStatus:(val:boolean)=>void;
+  status:boolean;
 }
 
-interface UserDetails {
-  userId: string;
+interface CandidateDetailsInf {
+  candidateId: string;
   candidateName: string;
-  email: string;
-  stack: string;
-  position: string;
-  cvUrl: string;
+  candidateEmail: string;
+  candidateStack: string;
+  candidatePosition: string;
+  candidateCvUrl: string;
 }
 
 interface InterviewDetails {
-  id: number;
+  _id: string;
   candidateId: string;
   accessKey: string;
   interviewDate: string;
@@ -42,32 +43,23 @@ export const CandidateContext = React.createContext<ContextInterface>(
   {} as ContextInterface
 );
 
-function Candidate() {
-  const { userId } = useParams();
+function CandidatePage() {
+  const { candidateId } = useParams();
   const redirect = useNavigate();
   const [activePage, setActivePage] = useState(1);
-  // const [component, setComponent] = useState<ReactElement>();
   const [status, setStatus] = useState(false); //Used for re-fetching data once the schedule is done
 
-  const [userDetails, setUserDetails] = useState({} as UserDetails);
+  const [candidateDetails, setCandidateDetails] = useState({} as CandidateDetailsInf);
   const [interviewDetails, setInterviewDetails] = useState(
     {} as InterviewDetails
   );
   const [questionsList, setQuestionsList] = useState([] as Questions[]);
-  // console.log("interview details ", interviewDetails);
-  // const temp = (
-  //   <SingleView
-  //     userDetails={userDetails}
-  //     interviewDetails={interviewDetails}
-  //     questions={questions}
-  //   />
-  // );
 
   //Delete Candidate
   const deleteCandidate = (candidateId: string) => {
     axios
       .delete(
-        import.meta.env.VITE_TEST_API + "/candidate/delete/" + candidateId
+        import.meta.env.VITE_BASE_URL + "/candidate/delete/" + candidateId
       )
       .then((res) => {
         console.log(res.data.message);
@@ -76,37 +68,48 @@ function Candidate() {
   };
 
   useEffect(() => {
-    console.log("toggled ", status);
+    // axios
+    //   .get(import.meta.env.VITE_API_URL + "/api/candidates/candidate-details/" + candidateId)
+    //   .then((res) => {
+    //     console.log(res.data.success.data[0])
+    //     setCandidateDetails(res.data.success.data[0].candidateDetails);
+    //     setInterviewDetails(res.data.success.data[0].interviewDetails);
+    //     setQuestionsList(res.data.success.data[0].questions);
+    //     console.log(res.data.success.message);
+    //   })
+    //   .catch((err) => {
+    //     if (err.response?.status) {
+    //       redirect("/page-not-found");
+    //     }
+    //   });
+    getCandidateDetails();
+  }, []);
+
+  //Get candidate details
+  const getCandidateDetails = ()=>{
+    console.log('cand id',candidateId)
     axios
-      .get(import.meta.env.VITE_TEST_API + "/candidate/" + userId)
+      .get(import.meta.env.VITE_API_URL + "/api/candidates/candidate-details/" + candidateId)
       .then((res) => {
-        // const element = (
-        //   <SingleView
-        //     userDetails={res.data.success.data.userDetails}
-        //     interviewDetails={res.data.success.data.interviewDetails}
-        //     questions={res.data.success.data.questions}
-        //   />
-        // );
-        // setComponent(element);
-        setUserDetails(res.data.success.data.userDetails);
-        setInterviewDetails(res.data.success.data.interviewDetails);
-        setQuestionsList(res.data.success.data.questions);
+        console.log('fff',res.data.success.data[0])
+        setCandidateDetails(res.data.success.data[0].candidateDetails);
+        setInterviewDetails(res.data.success.data[0].interviewDetails);
+        setQuestionsList(res.data.success.data[0].questions);
         console.log(res.data.success.message);
-        // console.log("rendered", res.data.success.data.interviewDetails);
       })
       .catch((err) => {
+        console.log('err',err.response);
         if (err.response?.status) {
           redirect("/page-not-found");
         }
       });
-  }, [status]);
+  }
 
   //pagination
   const range = 3;
   const startingValue = (activePage - 1) * range;
   const endingValue = startingValue + range;
   const questions = questionsList?.slice(startingValue, endingValue);
-  console.log("questions", questions);
 
   //Generate pagination data
   const onPageClick = (page: number) => {
@@ -114,15 +117,18 @@ function Candidate() {
   };
 
   return (
-    Object.keys(userDetails).length != 0 && (
+    Object.keys(candidateDetails).length != 0 && (
       <MainLayout>
-        <CandidateContext.Provider value={{ status, setStatus }}>
+        <CandidateContext.Provider value={{ getCandidateDetails, status, setStatus }}>
+        {/* <div className="border d-flex" style={{ position: "absolute", width: "100%", height:"100vh" }}> */}
+          <ScheduleInterviewModal interviewId={interviewDetails._id} modalId="scheduleModal" candidateId={candidateDetails.candidateId}/>
+        {/* </div> */}
           {/* <div>{component}</div> */}
-          <div className="container">
-            <CandidateDetails candidateDetails={userDetails} />
-            <InterviewStatus
+          <div className="container border border-danger px-0" style={{ position:"relative" }}>
+            <CandidateDetails candidateDetails={candidateDetails} />
+            <InterviewDetails
               interviewDetails={interviewDetails}
-              candidateId={userDetails.userId}
+              candidateId={candidateDetails.candidateId}
             />
             <InterviewQuestionsTable questions={questions} />
             {questions.length > 0 && (
@@ -143,7 +149,7 @@ function Candidate() {
                 className="btn btn-outline-danger mt-3 mx-1 pt-1 pb-1 w-25"
                 title="Remove candidate from the system, including the corresponding interviews"
                 onClick={() => {
-                  deleteCandidate(userDetails.userId);
+                  deleteCandidate(candidateDetails.candidateId);
                 }}
               >
                 Delete Candidate
@@ -156,4 +162,4 @@ function Candidate() {
   );
 }
 
-export default Candidate;
+export default CandidatePage;

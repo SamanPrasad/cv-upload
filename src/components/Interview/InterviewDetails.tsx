@@ -1,13 +1,13 @@
 // import { useState } from "react";
 import axios from "axios";
-import ScheduleInterviewButton from "./schedule-interview/ScheduleInterviewButton";
-import ScheduleInterviewModal from "./schedule-interview/ScheduleInterviewModal";
-import { CandidateContext } from "../../pages/Candidate";
+import ScheduleInterviewButton from "./InterviewDetails/ScheduleInterview/ScheduleInterviewButton";
+import ScheduleInterviewModal from "./InterviewDetails/ScheduleInterview/ScheduleInterviewModal";
+import { CandidateContext } from "../../pages/CandidatePage";
 import { useContext } from "react";
 
 interface Props {
   interviewDetails: {
-    id: number;
+    _id: string;
     candidateId: string;
     accessKey: string;
     interviewDate: string;
@@ -15,9 +15,10 @@ interface Props {
     status: string;
   };
   candidateId: string;
+  // getCandidateDetails:()=>void
 }
 
-function InterviewStatus({ interviewDetails, candidateId }: Props) {
+function InterviewDetails({ interviewDetails, candidateId }: Props) {
   //States
   const { status, setStatus } = useContext(CandidateContext);
 
@@ -27,7 +28,7 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
       candidateId: candidateId,
     };
     axios
-      .post(import.meta.env.VITE_TEST_API + "/interview/send-email", data)
+      .post(import.meta.env.VITE_API_URL + "/interview/send-email", data)
       .then((res) => {
         console.log(res.data.message);
       })
@@ -43,7 +44,7 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
       status: "Cancel",
     };
     axios
-      .post(import.meta.env.VITE_TEST_API + "/interview/update/", data)
+      .post(import.meta.env.VITE_API_URL + "/interview/update/", data)
       .then((res) => {
         console.log(res.data.message);
         setStatus(!status);
@@ -52,10 +53,10 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
   };
 
   //Delete interview
-  const deleteInterview = (interviewId: number) => {
+  const deleteInterview = (interviewId: string) => {
     axios
       .delete(
-        import.meta.env.VITE_TEST_API + "/interview/delete/" + interviewId
+        import.meta.env.VITE_API_URL + "/interview/delete/" + interviewId
       )
       .then((res) => {
         console.log(res.data.message);
@@ -63,20 +64,6 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
       })
       .catch((err) => console.log("Error :", err.message));
   };
-  //States
-  // const [hasInterview, setHasInterview] = useState(
-  //   Object.keys(interviewDetails).length == 0 ? false : true
-  // );
-  // const [sheduleDateTime, setScheduleDateTime] = useState(
-  //   Object.keys(interviewDetails).length == 0
-  //     ? ""
-  //     : interviewDetails.interviewDate + " | " + interviewDetails.startTime
-  // );
-  // const [interviewStatus, setInterviewStatus] = useState(
-  //   Object.keys(interviewDetails).length == 0 ? "" : interviewDetails.status
-  // );
-
-  // console.log("inter comp", interviewDetails);
 
   const scheduleElement = (
     <div className="row justify-content-center">
@@ -91,7 +78,7 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
         <div className="col-5">
           <h5 className="text-center">Interview Status</h5>
           <h3 className="text-primary text-center pt-2">
-            <strong>{interviewDetails?.status}</strong>
+            <strong>{Number(interviewDetails?.status) == 0 ? "Scheduled" : Number(interviewDetails?.status) ? "Cancelled": "Faced"}</strong>
           </h3>
           <h3 className="text-dark text-center pb-2">
             <strong>
@@ -119,7 +106,7 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
           type="button"
           className="btn btn-outline-danger mt-3 mx-1 pt-1 pb-1 w-25"
           onClick={() => {
-            deleteInterview(interviewDetails.id);
+            deleteInterview(interviewDetails._id);
           }}
         >
           Delete Interview
@@ -139,16 +126,14 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
     </div>
   );
 
-  console.log("canid", interviewDetails);
-
   return (
-    <div style={{ position: "relative" }} className="p-0">
-      <div style={{ position: "absolute", width: "100%" }}>
-        <ScheduleInterviewModal
+    <div style={{ }} className="p-0">
+      {/* <div className="border" style={{ position: "absolute", width: "100%", height:"100vh" }}> */}
+        {/* <ScheduleInterviewModal
           candidateId={candidateId}
           modalId="scheduleModal"
-        />
-      </div>
+        /> */}
+      {/* </div> */}
       <div className="container mt-3">
         <div className="row justify-content-center">
           <div className="col-8">
@@ -172,4 +157,4 @@ function InterviewStatus({ interviewDetails, candidateId }: Props) {
   );
 }
 
-export default InterviewStatus;
+export default InterviewDetails;

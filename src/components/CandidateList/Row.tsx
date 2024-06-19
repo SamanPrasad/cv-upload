@@ -6,7 +6,7 @@ interface Props {
 }
 
 interface Candidate {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   url: string;
@@ -26,9 +26,9 @@ function Row({ candidate }: Props) {
       };
 
       axios
-        .put(import.meta.env.VITE_TEST_API + "/update", data)
+        .put(import.meta.env.VITE_API_URL + "/api/candidates/update-no-of-questions", data)
         .then((res) => {
-          console.log("Successful!");
+          console.log(res.data.success.message);
         })
         .catch((err) => console.log("Update Error :" + err.message));
     }
@@ -37,7 +37,7 @@ function Row({ candidate }: Props) {
   };
 
   return (
-    <tr key={candidate.id}>
+    <tr key={candidate._id}>
       <td>•</td>
       <td className="cv-td">{candidate.name}</td>
       <td className="cv-td">{candidate.email}</td>
@@ -63,26 +63,26 @@ function Row({ candidate }: Props) {
           }
           onClick={() => {
             setIsEnabled(!isEnabled);
-            updateCount(candidate.id);
+            updateCount(candidate._id);
           }}
         >
           {isEnabled ? "Update" : "Edit"}
         </button>
       </td>
       <td>
-        <button type="button" className="btn btn-outline-primary mx-1 py-0">
-          <a href={candidate.url} className="cv-anchor">
+        <a href={candidate.url} className="cv-anchor btn btn-outline-primary mx-1 py-0">
+          {/* <button type="button" className="btn btn-outline-primary mx-1 py-0"> */}
             Download CV
-          </a>
-        </button>
-        <button type="button" className="btn btn-outline-primary mx-1 py-0">
+          {/* </button> */}
+        </a>
+        {/* <button type="button" className="btn btn-outline-primary mx-1 py-0"> */}
           <a
-            href={import.meta.env.VITE_BASE_URL + "/view/" + candidate.id}
-            className="cv-anchor"
+            href={import.meta.env.VITE_BASE_URL + "/view/" + candidate._id}
+            className="cv-anchor btn btn-outline-primary mx-1 py-0"
           >
             View
           </a>
-        </button>
+        {/* </button> */}
       </td>
     </tr>
   );

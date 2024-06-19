@@ -1,14 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import Table from "../components/candidate-list/Table";
+import Table from "../components/CandidateList/Table";
 import { useEffect, useState } from "react";
 import axios from "axios";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faUser } from "@fortawesome/free-solid-svg-icons";
 import Paginator from "../components/Paginator";
 import MainLayout from "../layouts/MainLayout";
 
 interface Candidate {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   url: string;
@@ -19,14 +16,14 @@ function CandidateListPage() {
   //state
   const [activePage, setActivePage] = useState(1);
   const [candidatesList, setCandidatesList] = useState<Candidate[]>([]);
-  // const navigate = useNavigate();
 
   //get candidates
   const getCandidates = () => {
     axios
-      .get(import.meta.env.VITE_TEST_API + "/candidates")
+      .get(import.meta.env.VITE_API_URL + "/api/candidates/all")
       .then((res) => {
-        setCandidatesList(res.data.data);
+        console.log(res.data.success.data)
+        setCandidatesList(res.data.success.data);
       })
       .catch((err) => console.log("Data fetching error :" + err.message));
   };
@@ -54,6 +51,7 @@ function CandidateListPage() {
             <h1 className="my-5 text-center display-2">List of Candidates</h1>
             <div className="row justify-content-center">
               <div className="col-8">
+                {candidates.length > 0}
                 <Table candidates={candidates} />
                 <div className="d-flex justify-content-center">
                   <Paginator

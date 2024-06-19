@@ -8,16 +8,16 @@ import { useForm } from "react-hook-form";
 
 //interfaces
 interface Stack {
-  id: number;
+  _id: string;
   name: string;
 }
 
 interface Position {
-  id: number;
-  position: string;
+  _id: string;
+  name: string;
 }
 
-function AddCandidate() {
+function AddCandidatePage() {
   const [stacksList, setStacksList] = useState<Stack[]>([]);
   const [positionList, setPositionList] = useState<Position[]>([]);
 
@@ -29,9 +29,9 @@ function AddCandidate() {
   //fetch stacks list
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL + "/stacks")
+      .get(import.meta.env.VITE_API_URL + "/api/stacks")
       .then((res) => {
-        setStacksList(res.data);
+        setStacksList(res.data.success.data);
       })
       .catch((err) => {
         console.log("Error :" + err.message);
@@ -41,9 +41,10 @@ function AddCandidate() {
   //fetch positions list
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL + "/positions")
+      .get(import.meta.env.VITE_API_URL + "/api/positions")
       .then((res) => {
-        setPositionList(res.data);
+        console.log(res.data.success.data)
+        setPositionList(res.data.success.data);
       })
       .catch((err) => {
         console.log("Error :" + err.message);
@@ -63,7 +64,7 @@ function AddCandidate() {
       })
       .refine((files) => "application/pdf" == files[0]?.type, {
         message:
-          "File type not supported. Please upload a JPEG, PNG, or PDF file.",
+          "File type not supported. Please upload a PDF file.",
       }),
   });
 
@@ -87,7 +88,7 @@ function AddCandidate() {
     console.log(formData);
 
     axios
-      .post(import.meta.env.VITE_TEST_API + "/create", formData)
+      .post(import.meta.env.VITE_API_URL + "/api/candidates/create", formData)
       .then((res) => {
         navigate("/list");
       })
@@ -151,7 +152,7 @@ function AddCandidate() {
                 >
                   <option value="">Choose...</option>
                   {stacksList.map((item, index) => (
-                    <option key={index} value={item.name}>
+                    <option key={index} value={item._id}>
                       {item.name}
                     </option>
                   ))}
@@ -175,8 +176,8 @@ function AddCandidate() {
                 >
                   <option value="">Choose...</option>
                   {positionList.map((item, index) => (
-                    <option key={index} value={item.position}>
-                      {item.position}
+                    <option key={index} value={item._id}>
+                      {item.name}
                     </option>
                   ))}
                 </select>
@@ -217,4 +218,4 @@ function AddCandidate() {
   );
 }
 
-export default AddCandidate;
+export default AddCandidatePage;

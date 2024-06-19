@@ -9,26 +9,15 @@ import {
   LoaderFunctionArgs,
   redirect,
 } from "react-router-dom";
-import AddCandidate from "./pages/AddCandidate.tsx";
+import AddCandidatePage from "./pages/AddCandidatePage.tsx";
 import CandidateListPage from "./pages/CandidateListPage.tsx";
-import Candidate from "./pages/Candidate.tsx";
+import CandidatePage from "./pages/CandidatePage.tsx";
 import PageNotFound from "./components/PageNotFound.tsx";
-import Test from "./components/Test.tsx";
-
-const validateUserId = async ({ params }: LoaderFunctionArgs) => {
-  const userId = Number(params.userId);
-  if (isNaN(userId)) {
-    return redirect("/page-not-found");
-  } else if (userId === 0) {
-    return redirect("/page-not-found");
-  }
-  return null;
-};
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AddCandidate />,
+    element: <AddCandidatePage />,
     errorElement: <PageNotFound />,
   },
   {
@@ -37,17 +26,12 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/view/:userId",
-    element: <Candidate />,
-    loader: validateUserId,
+    path: "/view/:candidateId",
+    element: <CandidatePage />,
   },
   {
     path: "/page-not-found",
     element: <PageNotFound />,
-  },
-  {
-    path: "/test",
-    element: <Test />,
   },
 ]);
 

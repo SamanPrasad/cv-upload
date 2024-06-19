@@ -7,7 +7,7 @@ interface Props {
 
 function MainLayout({ children }: Props) {
   return (
-    <div>
+    <div className="container" style={{ position:"relative" }}>
       <Navbar />
       {children}
     </div>

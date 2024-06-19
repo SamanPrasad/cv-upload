@@ -1,21 +1,25 @@
 import axios from "axios";
 import { useContext, useRef, useState } from "react";
-import { CandidateContext } from "../../../pages/Candidate";
+import { CandidateContext } from "../../../../pages/CandidatePage";
 
 interface Props {
   modalId: string;
   candidateId: string;
+  interviewId?:string
+  // getCandidateDetails:()=>void
 }
 
-function ScheduleInterviewModal({ modalId, candidateId }: Props) {
-  console.log("can", candidateId);
+function ScheduleInterviewModal({ modalId, candidateId, interviewId }: Props) {
+  console.log('int id', interviewId)
+  console.log("can ssss", candidateId);
   const refDateTime = useRef<HTMLInputElement>(null);
   const [cssClass, setCssClass] = useState("");
   let scheduledDateTime: string = "";
 
-  const { status, setStatus } = useContext(CandidateContext);
+  const { getCandidateDetails } = useContext(CandidateContext);
+  // const { status, setStatus } = useContext(CandidateContext);
 
-  const scheduleInterview = () => {
+  const handleButtonClick = () => {
     const dateTime = refDateTime.current?.value;
     const temp = dateTime?.split("T");
     if (temp && temp.length == 2) {
@@ -33,6 +37,11 @@ function ScheduleInterviewModal({ modalId, candidateId }: Props) {
     }
   };
 
+  //Schedule Interview
+  const scheduleInterview = ()=>{
+
+  }
+
   //Save data
   const saveData = (data: {
     candidateId: string;
@@ -40,15 +49,15 @@ function ScheduleInterviewModal({ modalId, candidateId }: Props) {
     startTime: string;
   }) => {
     axios
-      .post(import.meta.env.VITE_TEST_API + "/schedule", data)
+      .post(import.meta.env.VITE_API_URL + "/api/interviews/schedule", data)
       .then((res) => {
-        // console.log("inner", res.data.message);
+        console.log(res.data.success.message)
         resetInput();
         setCssClass("cv-show");
-        // onSchedule(true, scheduledDateTime, "Scheduled");
-        setStatus(!status);
+        // setStatus(!status);
+        getCandidateDetails()
       })
-      .catch((err) => console.log(err.messsage));
+      .catch((err) => console.log('err',err.message));
   };
 
   //Reset Input
@@ -62,10 +71,10 @@ function ScheduleInterviewModal({ modalId, candidateId }: Props) {
 
   return (
     <div
-      className="modal fade modal-dialog modal-dialog-centered cv-modal-position"
+      className="modal fade modal-dialog modal-dialog-centered"
       id={modalId}
       aria-hidden="true"
-      style={{ display: "none" }}
+      style={{ display: "none",position: "fixed", left:"50%", transform: 'translateX(-50%)'}}
     >
       <div className="modal-dialog">
         <div className="modal-content">
@@ -103,7 +112,7 @@ function ScheduleInterviewModal({ modalId, candidateId }: Props) {
             <button
               type="button"
               className="btn btn-primary rounded-pill w-25"
-              onClick={scheduleInterview}
+              onClick={handleButtonClick}
             >
               Schedule
             </button>
