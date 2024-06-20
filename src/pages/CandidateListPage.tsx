@@ -1,14 +1,21 @@
 import Table from "../components/CandidateList/Table";
-import { useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
 import Paginator from "../components/Paginator";
 import MainLayout from "../layouts/MainLayout";
 
+export const CandidateContext = createContext<ContextInterface>(
+  {} as ContextInterface
+);
+interface ContextInterface {
+  candidatesList: Candidate[];
+  setCandidatesList: Dispatch<SetStateAction<Candidate[]>>
+}
 interface Candidate {
   _id: string;
   name: string;
   email: string;
-  url: string;
+  cvUrl: string;
   no_of_questions: number;
 }
 
@@ -25,7 +32,7 @@ function CandidateListPage() {
         console.log(res.data.success.data)
         setCandidatesList(res.data.success.data);
       })
-      .catch((err) => console.log("Data fetching error :" + err.message));
+      .catch((err) => console.log("Error :" + err.response.data.error.message));
   };
 
   useEffect(() => {
@@ -35,8 +42,7 @@ function CandidateListPage() {
   //pagination
   const range = 3;
   const startingValue = (activePage - 1) * range;
-  const endingValue = startingValue + range;
-  const candidates = candidatesList?.slice(startingValue, endingValue);
+  const endingValue = startingValue + (range - 1);
 
   //Generate pagination data
   const onPageClick = (page: number) => {
@@ -51,15 +57,18 @@ function CandidateListPage() {
             <h1 className="my-5 text-center display-2">List of Candidates</h1>
             <div className="row justify-content-center">
               <div className="col-8">
-                {candidates.length > 0}
-                <Table candidates={candidates} />
+                {candidatesList.length > 0}
+                <CandidateContext.Provider value={{ candidatesList, setCandidatesList }}>
+                  <Table candidatesList={candidatesList} startingIndex={startingValue} endingIndex={endingValue} />
+                </CandidateContext.Provider>
                 <div className="d-flex justify-content-center">
-                  <Paginator
+                  {candidatesList.length > 0 && <Paginator
                     activePage={activePage}
                     itemsCount={candidatesList?.length}
                     range={range}
                     onPageClick={onPageClick}
-                  />
+                  />}
+                  {candidatesList.length == 0 && <h2 className="text-center text-secondary">No data to display</h2>}
                 </div>
               </div>
             </div>

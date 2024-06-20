@@ -1,5 +1,3 @@
-import { ReactElement } from "react";
-
 interface Props {
   modalId: string;
   children: string;

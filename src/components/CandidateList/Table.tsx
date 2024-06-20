@@ -1,16 +1,28 @@
+import { ReactElement } from "react";
 import Row from "./Row";
 
 interface Props {
-  candidates: {
+  candidatesList: {
     _id: string;
     name: string;
     email: string;
-    url: string;
+    cvUrl: string;
     no_of_questions: number;
   }[];
+  startingIndex:number;
+  endingIndex:number
 }
 
-function Table({ candidates }: Props) {
+function Table({ candidatesList, startingIndex, endingIndex }: Props) {
+  let items:ReactElement[] = [];
+  candidatesList.forEach((item, index)=>{
+    console.log('index', index);
+    if(index >=startingIndex && index <= endingIndex){
+      items.push(<Row candidate={item} key={index} index={index}/>)
+    }
+  })
+
+  console.log('items', items)
   return (
     <div>
       <table className="table">
@@ -24,9 +36,7 @@ function Table({ candidates }: Props) {
           </tr>
         </thead>
         <tbody>
-          {candidates?.map((item, index) => (
-            <Row candidate={item} key={index} />
-          ))}
+          {items}
         </tbody>
       </table>
     </div>

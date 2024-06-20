@@ -51,6 +51,10 @@
   color: rgba(255, 0, 0, 0.774);
 }
 
+.cv-success-message{
+  color: rgb(11, 187, 73);
+}
+
 .cv-schedule-modal{
   position: fixed;
   left:50%;

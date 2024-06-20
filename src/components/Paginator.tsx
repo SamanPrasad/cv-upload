@@ -25,9 +25,9 @@ function Paginator({ activePage, itemsCount, range, onPageClick }: Props) {
   return (
     <div>
       <Pagination size="sm">
-        <Pagination.First>{"<< First"}</Pagination.First>
+        <Pagination.First onClick={() => onPageClick(1)}>{"<< First"}</Pagination.First>
         {items}
-        <Pagination.Last>{"Last >>"}</Pagination.Last>
+        <Pagination.Last onClick={() => onPageClick(pagesCount)}>{"Last >>"}</Pagination.Last>
       </Pagination>
     </div>
   );

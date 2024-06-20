@@ -11,7 +11,6 @@ interface Stack {
   _id: string;
   name: string;
 }
-
 interface Position {
   _id: string;
   name: string;
@@ -21,7 +20,7 @@ function AddCandidatePage() {
   const [stacksList, setStacksList] = useState<Stack[]>([]);
   const [positionList, setPositionList] = useState<Position[]>([]);
 
-  const [isUploadFailed, setIsUploadFailed] = useState(false);
+  const [candidateCreateErrorMessage, setCandidateCreateErrorMessage] = useState(false);
 
   //redirecting
   const navigate = useNavigate();
@@ -85,7 +84,6 @@ function AddCandidatePage() {
     formData.append("stack", data.stack);
     formData.append("position", data.position);
     formData.append("file", data.file[0]);
-    console.log(formData);
 
     axios
       .post(import.meta.env.VITE_API_URL + "/api/candidates/create", formData)
@@ -93,8 +91,8 @@ function AddCandidatePage() {
         navigate("/list");
       })
       .catch((err) => {
-        console.log(err.message);
-        setIsUploadFailed(true);
+        console.log(err.response.data.error.message);
+        setCandidateCreateErrorMessage(err.response.data.error.message);
       });
   };
 
@@ -206,10 +204,8 @@ function AddCandidatePage() {
                 </button>
               </div>
             </form>
-            <div className="cv-error-message text-center mt-0 p-2">
-              {isUploadFailed && (
-                <p className="h3">Something went wrong. Please Try Again !</p>
-              )}
+            <div className="cv-error-message mt-2">
+              <h3 className="text-center">{candidateCreateErrorMessage}</h3>
             </div>
           </div>
         </div>

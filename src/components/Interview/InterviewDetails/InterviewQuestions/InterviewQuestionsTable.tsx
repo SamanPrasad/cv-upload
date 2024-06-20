@@ -1,16 +1,24 @@
+import { ReactElement } from "react";
 import Row from "./Row";
-
-
 interface Props {
-  questions: {
+  questionsList: {
     id: number;
     question: string;
     answer: string;
-    candidateAnswer: string;
+    candidateAnswers: string;
     isCorrect: string;
   }[];
+  startingIndex:number,
+  endingIndex:number
 }
-function InterviewQuestionsTable({ questions }: Props) {
+function InterviewQuestionsTable({ questionsList, startingIndex, endingIndex }: Props) {
+  let items:ReactElement[] = []
+
+  questionsList.forEach((item, index)=>{
+    if(index >= startingIndex && index <=endingIndex){
+      items.push(<Row question={item} key={index} index={index} />)
+    }
+  })
   return (
     <div className="container mt-3">
       <div className="row justify-content-center">
@@ -37,9 +45,10 @@ function InterviewQuestionsTable({ questions }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {questions.map((item, index) => (
+                  {items}
+                  {/* {questions.map((item, index) => (
                     <Row question={item} key={index} />
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
             </div>

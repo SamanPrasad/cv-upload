@@ -1,23 +1,20 @@
-import axios from "axios";
-import { useContext, useRef, useState } from "react";
+import axios, { AxiosResponse } from "axios";
+import { Dispatch, SetStateAction, useContext, useRef, useState } from "react";
 import { CandidateContext } from "../../../../pages/CandidatePage";
 
 interface Props {
   modalId: string;
   candidateId: string;
-  interviewId?:string
-  // getCandidateDetails:()=>void
+  interviewId?: string;
+  setRescheduledTime:Dispatch<SetStateAction<string>>;
 }
 
-function ScheduleInterviewModal({ modalId, candidateId, interviewId }: Props) {
-  console.log('int id', interviewId)
-  console.log("can ssss", candidateId);
+function ScheduleInterviewModal({ modalId, candidateId, interviewId, setRescheduledTime }: Props) {
   const refDateTime = useRef<HTMLInputElement>(null);
   const [cssClass, setCssClass] = useState("");
-  let scheduledDateTime: string = "";
+  const[responseMessage, setResponseMessage] = useState("")
 
   const { getCandidateDetails } = useContext(CandidateContext);
-  // const { status, setStatus } = useContext(CandidateContext);
 
   const handleButtonClick = () => {
     const dateTime = refDateTime.current?.value;
@@ -25,46 +22,62 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId }: Props) {
     if (temp && temp.length == 2) {
       const date = temp[0];
       const time = temp[1];
-      let data = {
-        candidateId: candidateId,
-        interviewDate: date,
-        startTime: time,
-      };
+      let axiosPromise = {} as Promise<AxiosResponse>;
 
-      scheduledDateTime = date + " | " + time;
+      if (interviewId) {
+        axiosPromise = rescheduleInterview(interviewId, date, time);
+      }else{
+        axiosPromise = scheduleInterview(candidateId, date, time)
+      }
 
-      saveData(data);
+      axiosPromise
+      .then((res) => {
+        console.log(res.data.success.message)
+        if(interviewId){
+          setResponseMessage("Rescheduled Successfully !")
+          setRescheduledTime(date+" | "+time)
+        }else{
+          setResponseMessage("Scheduled Successfully !")
+          getCandidateDetails()
+        }
+        setCssClass("cv-show text-success");
+        resetInput();
+      })
+      .catch((err) => {
+        console.log("Error :",err.response.data.error.message)
+        setResponseMessage(err.response.data.error.message)
+        setCssClass("cv-show text-danger");
+      });
     }
   };
 
   //Schedule Interview
-  const scheduleInterview = ()=>{
-
+  const scheduleInterview = (candidateId: string, interviewDate: string, startTime: string):Promise<AxiosResponse> => {
+    let data = {
+      candidateId,
+      interviewDate,
+      startTime
+    }
+    return axios.post(import.meta.env.VITE_API_URL + "/api/interviews/schedule", data)
   }
 
-  //Save data
-  const saveData = (data: {
-    candidateId: string;
-    interviewDate: string;
-    startTime: string;
-  }) => {
-    axios
-      .post(import.meta.env.VITE_API_URL + "/api/interviews/schedule", data)
-      .then((res) => {
-        console.log(res.data.success.message)
-        resetInput();
-        setCssClass("cv-show");
-        // setStatus(!status);
-        getCandidateDetails()
-      })
-      .catch((err) => console.log('err',err.message));
-  };
+  //Reschedule Interview
+  const rescheduleInterview = (interviewId: string, interviewDate: string, startTime: string):Promise<AxiosResponse> => {
+    let data = {
+      interviewId,
+      interviewDate,
+      startTime
+    }
+    return axios.put(import.meta.env.VITE_API_URL + "/api/interviews/reschedule", data)
+
+  }
 
   //Reset Input
   const cancelInput = () => {
     resetInput();
     setCssClass("");
   };
+  
   const resetInput = () => {
     if (refDateTime.current) refDateTime.current.value = "";
   };
@@ -74,7 +87,7 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId }: Props) {
       className="modal fade modal-dialog modal-dialog-centered"
       id={modalId}
       aria-hidden="true"
-      style={{ display: "none",position: "fixed", left:"50%", transform: 'translateX(-50%)'}}
+      style={{ display: "none", position: "fixed", left: "50%", transform: 'translateX(-50%)' }}
     >
       <div className="modal-dialog">
         <div className="modal-content">
@@ -95,9 +108,9 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId }: Props) {
               ref={refDateTime}
             />
           </div>
-          <div className={"border cv-response-message " + cssClass}>
-            <h5 className="text-center text-success">
-              Scheduled Successfully !
+          <div className={"cv-response-message " + cssClass}>
+            <h5 className="text-center">
+              {responseMessage}
             </h5>
           </div>
           <div className="modal-footer justify-content-center">
