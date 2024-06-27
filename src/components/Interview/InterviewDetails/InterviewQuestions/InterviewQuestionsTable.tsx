@@ -19,6 +19,7 @@ function InterviewQuestionsTable({ questionsList, startingIndex, endingIndex }: 
       items.push(<Row question={item} key={index} index={index} />)
     }
   })
+  
   return (
     <div className="container mt-3">
       <div className="row justify-content-center">

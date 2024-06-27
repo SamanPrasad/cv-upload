@@ -34,7 +34,6 @@ function Row({ candidate, index }: Props) {
       axios
         .put(import.meta.env.VITE_API_URL + "/api/candidates/update-no-of-questions", data)
         .then((res) => {
-          console.log('hello')
           const candidatesTemp = [...candidatesList];
           candidatesTemp[index].no_of_questions = Number(count);
           setCandidatesList(candidatesTemp);

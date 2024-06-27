@@ -99,7 +99,6 @@ function CandidatePage() {
   //pagination
   const range = 3;
   const startingValue = (activePage - 1) * range;
-  // const endingValue = startingValue + range;
   const endingValue = startingValue + (range - 1);
   const questions = questionsList?.slice(startingValue, endingValue);
 
@@ -115,10 +114,6 @@ function CandidatePage() {
           <ScheduleInterviewModal setRescheduledTime={setRescheduledTime} interviewId={interviewDetails.interviewId} modalId="scheduleModal" candidateId={candidateDetails.candidateId} />
           <div className="container px-0">
             <CandidateDetails candidateDetails={candidateDetails} />
-            {/* <InterviewDetails
-              rescheduledTime={rescheduledTime}
-              interviewDetails={interviewDetails}              
-            /> */}
             <Interview rescheduledTime={rescheduledTime} interviewDetails={interviewDetails} candidateId={candidateDetails.candidateId}/>
             <InterviewQuestionsTable questionsList={questionsList} startingIndex={startingValue} endingIndex={endingValue} />
             {questions.length > 0 && (

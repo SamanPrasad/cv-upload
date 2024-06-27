@@ -24,34 +24,6 @@ function Interview({ interviewDetails, rescheduledTime, candidateId }: Props) {
     const [hasInterview, setHasInterview] = useState(Object.keys(interviewDetails).length == 0 ? false : true)
     const [interviewErrorMessage, setInterviewErrorMessage] = useState("")
 
-
-    // const scheduleElement = (
-    //     <div className="row justify-content-center">
-    //         <ScheduleInterviewButton modalId="scheduleModal">
-    //             Schedule Interview
-    //         </ScheduleInterviewButton>
-    //     </div>
-    // );
-    // const editScheduleElement = (
-    //     <div className="container">
-    //         <div className="row justify-content-center pt-3">
-    //             <div className="row">
-    //                 <InterviewDetails interviewDetails={interviewDetails} rescheduledTime={rescheduledTime} />
-    //             </div>
-    //         </div>
-    //         {hasInterview && <div className="row justify-content-center">
-    //             <ScheduleInterviewButton modalId="scheduleModal">
-    //                 Re-schedule Interview
-    //             </ScheduleInterviewButton>
-    //             <CancelInterview setInterviewErrorMessage={setInterviewErrorMessage} setHasInterview={setHasInterview} interviewId={interviewDetails.interviewId} />
-    //             <SendEmail setInterviewErrorMessage={setInterviewErrorMessage} candidateId={candidateId} />
-    //         </div>}
-    //         <div className="row cv-error-message mt-2">
-    //             <h3 className="text-center">{interviewErrorMessage}</h3>
-    //         </div>
-    //     </div>
-    // );
-
     return (
         <div style={{}} className="p-0">
             <div className="container mt-3">
