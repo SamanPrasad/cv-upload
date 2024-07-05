@@ -33,14 +33,14 @@ function Row({ candidate, index }: Props) {
 
       axios
         .put(import.meta.env.VITE_API_URL + "/api/candidates/update-no-of-questions", data)
-        .then((res) => {
+        .then(() => {
           const candidatesTemp = [...candidatesList];
           candidatesTemp[index].no_of_questions = Number(count);
           setCandidatesList(candidatesTemp);
           setIsEnabled(!isEnabled);
         })
         .catch((err) => {
-          console.log("Error :" + err.response.data.error.message);
+          console.log("Error :" + err.message);
           setCountUpdateErrorMessage(err.response.data.error.message)
           setCssClass("cv-show")
         });

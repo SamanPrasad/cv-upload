@@ -3,24 +3,34 @@ import { Dispatch, SetStateAction } from "react";
 
 interface Props {
     setInterviewErrorMessage: Dispatch<SetStateAction<string>>;
+    setInterviewErrorClass: Dispatch<SetStateAction<string>>;
+    setIsEmailSending: Dispatch<SetStateAction<boolean>>;
     candidateId: string;
 }
 
-function SendEmail({ setInterviewErrorMessage, candidateId }: Props) {
+function SendEmail({ setInterviewErrorClass, setInterviewErrorMessage, setIsEmailSending, candidateId }: Props) {
 
     //Send Email
     const sendEmail = (candidateId: string) => {
+      setIsEmailSending(true);
         const data = {
           candidateId: candidateId,
         };
         axios
           .post(import.meta.env.VITE_API_URL + "/api/interviews/send-interview-details", data)
+          .finally(()=>{
+            //Stop loader
+            setIsEmailSending(false);
+          })
           .then((res) => {
-            console.log(res.data.success.message);
+            //no candidate found
+            res.data.success.data == null ? setInterviewErrorClass("cv-error-message") : setInterviewErrorClass("cv-success-message");
+            
             setInterviewErrorMessage(res.data.success.message);
           })
           .catch((err) => {
-            console.log("Error :", err.response.data.error.message);
+            console.log("Error :", err.message);
+            setInterviewErrorClass("cv-error-message")
             setInterviewErrorMessage(err.response.data.error.message)
           });
       };

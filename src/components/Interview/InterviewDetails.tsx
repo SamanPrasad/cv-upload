@@ -1,3 +1,5 @@
+import interviewStatus from "../../constants";
+
 interface Props {
   interviewDetails: {
     interviewId: string;
@@ -7,29 +9,28 @@ interface Props {
     startTime: string;
     status: string;
   };
-  rescheduledTime: string;
 }
 
-function InterviewDetails({ interviewDetails, rescheduledTime }: Props) {
+function InterviewDetails({ interviewDetails }: Props) {
   return (<div>
     <h5 className="text-center">Interview Status</h5>
     <h3 className="text-primary text-center pt-2">
       <strong>{
-        Number(interviewDetails?.status) == 0
+        Number(interviewDetails?.status) == interviewStatus.SCHEDULED
           ? "Scheduled"
-          : Number(interviewDetails?.status) == 1
+          : Number(interviewDetails?.status) == interviewStatus.STARTED
             ? "Started"
-            : Number(interviewDetails?.status) == 2
+            : Number(interviewDetails?.status) == interviewStatus.COMPLETED
               ? "Completed"
-              : Number(interviewDetails?.status) == 3
+              : Number(interviewDetails?.status) == interviewStatus.NOT_PARTICIPATED
                 ? "Not Participated"
                 : "Canceled"}</strong>
     </h3>
     <h3 className="text-dark text-center pb-2">
       <strong>
-        {rescheduledTime.length > 0 ? rescheduledTime : (interviewDetails?.interviewDate +
+        {interviewDetails?.interviewDate +
           " | " +
-          interviewDetails.startTime)}
+          interviewDetails.startTime}
       </strong>
     </h3>
   </div>)

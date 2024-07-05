@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -6,13 +5,12 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import {
   RouterProvider,
   createBrowserRouter,
-  LoaderFunctionArgs,
-  redirect,
 } from "react-router-dom";
 import AddCandidatePage from "./pages/AddCandidatePage.tsx";
 import CandidateListPage from "./pages/CandidateListPage.tsx";
 import CandidatePage from "./pages/CandidatePage.tsx";
 import PageNotFound from "./components/PageNotFound.tsx";
+import React from "react";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +34,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <React.StrictMode>
+  <React.StrictMode>
   <RouterProvider router={router} />
-  // </React.StrictMode>
+  </React.StrictMode>
 );

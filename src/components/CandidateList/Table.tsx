@@ -15,11 +15,13 @@ interface Props {
 
 function Table({ candidatesList, startingIndex, endingIndex }: Props) {
   let items:ReactElement[] = [];
-  candidatesList.forEach((item, index)=>{
-    if(index >=startingIndex && index <= endingIndex){
-      items.push(<Row candidate={item} key={index} index={index}/>)
-    }
-  })
+  if(candidatesList != null){
+    candidatesList.forEach((item, index)=>{
+      if(index >=startingIndex && index <= endingIndex){
+        items.push(<Row candidate={item} key={index} index={index}/>)
+      }
+    })
+  }
 
   return (
     <div>

@@ -1,18 +1,31 @@
 import axios, { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction, useContext, useRef, useState } from "react";
 import { CandidateContext } from "../../../../pages/CandidatePage";
+import interviewStatus from "../../../../constants";
+import { RotatingLines } from "react-loader-spinner";
 
 interface Props {
   modalId: string;
   candidateId: string;
   interviewId?: string;
-  setRescheduledTime:Dispatch<SetStateAction<string>>;
+  setInterviewDetails: Dispatch<SetStateAction<InterviewDetails>>;
+  interviewDetails: InterviewDetails
 }
 
-function ScheduleInterviewModal({ modalId, candidateId, interviewId, setRescheduledTime }: Props) {
+interface InterviewDetails {
+  interviewId: string;
+  candidateId: string;
+  accessKey: string;
+  interviewDate: string;
+  startTime: string;
+  status: string;
+}
+
+function ScheduleInterviewModal({ modalId, candidateId, interviewId, setInterviewDetails, interviewDetails }: Props) {
   const refDateTime = useRef<HTMLInputElement>(null);
   const [cssClass, setCssClass] = useState("");
-  const[responseMessage, setResponseMessage] = useState("")
+  const [responseMessage, setResponseMessage] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
 
   const { getCandidateDetails } = useContext(CandidateContext);
 
@@ -20,39 +33,50 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setReschedu
     const dateTime = refDateTime.current?.value;
     const temp = dateTime?.split("T");
     if (temp && temp.length == 2) {
+      setIsLoading(true)
       const date = temp[0];
       const time = temp[1];
       let axiosPromise = {} as Promise<AxiosResponse>;
 
       if (interviewId) {
         axiosPromise = rescheduleInterview(interviewId, date, time);
-      }else{
+      } else {
         axiosPromise = scheduleInterview(candidateId, date, time)
       }
 
       axiosPromise
-      .then((res) => {
-        console.log(res.data.success.message)
-        if(interviewId){
-          setResponseMessage("Rescheduled Successfully !")
-          setRescheduledTime(date+" | "+time)
-        }else{
-          setResponseMessage("Scheduled Successfully !")
-          getCandidateDetails()
-        }
-        setCssClass("cv-show text-success");
-        resetInput();
-      })
-      .catch((err) => {
-        console.log("Error :",err.response.data.error.message)
-        setResponseMessage(err.response.data.error.message)
-        setCssClass("cv-show text-danger");
-      });
+        .finally(() => {
+          //stop loader
+          setIsLoading(false);
+        })
+        .then((res) => {
+          //Candidate not found
+          if (res.data.success.data == null) {
+            setCssClass("cv-show text-danger");
+            setResponseMessage(res.data.success.message);
+            return;
+          }
+
+          if (interviewId) {
+            setResponseMessage("Rescheduled Successfully !")
+            setInterviewDetails({ ...interviewDetails, interviewDate: res.data.success.data.interview_date, startTime: res.data.success.data.start_time, status: interviewStatus.SCHEDULED.toString() })
+          } else {
+            setResponseMessage("Scheduled Successfully !")
+            getCandidateDetails()
+          }
+          setCssClass("cv-show text-success");
+          resetInput();
+        })
+        .catch((err) => {
+          console.log("Error :", err.message)
+          setResponseMessage(err.response.data.error.message)
+          setCssClass("cv-show text-danger");
+        });
     }
   };
 
   //Schedule Interview
-  const scheduleInterview = (candidateId: string, interviewDate: string, startTime: string):Promise<AxiosResponse> => {
+  const scheduleInterview = (candidateId: string, interviewDate: string, startTime: string): Promise<AxiosResponse> => {
     let data = {
       candidateId,
       interviewDate,
@@ -62,7 +86,7 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setReschedu
   }
 
   //Reschedule Interview
-  const rescheduleInterview = (interviewId: string, interviewDate: string, startTime: string):Promise<AxiosResponse> => {
+  const rescheduleInterview = (interviewId: string, interviewDate: string, startTime: string): Promise<AxiosResponse> => {
     let data = {
       interviewId,
       interviewDate,
@@ -76,8 +100,9 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setReschedu
   const cancelInput = () => {
     resetInput();
     setCssClass("");
+    setResponseMessage("");
   };
-  
+
   const resetInput = () => {
     if (refDateTime.current) refDateTime.current.value = "";
   };
@@ -110,7 +135,13 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setReschedu
           </div>
           <div className={"cv-response-message " + cssClass}>
             <h5 className="text-center">
-              {responseMessage}
+              {isLoading ? <RotatingLines
+                strokeColor="grey"
+                strokeWidth="5"
+                animationDuration="0.75"
+                width="40"
+                visible={true}
+              /> : responseMessage}
             </h5>
           </div>
           <div className="modal-footer justify-content-center">

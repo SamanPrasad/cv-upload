@@ -5,6 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { RotatingLines } from "react-loader-spinner";
 
 //interfaces
 interface Stack {
@@ -19,6 +20,7 @@ interface Position {
 function AddCandidatePage() {
   const [stacksList, setStacksList] = useState<Stack[]>([]);
   const [positionList, setPositionList] = useState<Position[]>([]);
+  const[isCreatingCandidate, setIsCreatingCandidate] = useState(false);
 
   const [candidateCreateErrorMessage, setCandidateCreateErrorMessage] = useState(false);
 
@@ -42,7 +44,6 @@ function AddCandidatePage() {
     axios
       .get(import.meta.env.VITE_API_URL + "/api/positions")
       .then((res) => {
-        console.log(res.data.success.data)
         setPositionList(res.data.success.data);
       })
       .catch((err) => {
@@ -83,15 +84,31 @@ function AddCandidatePage() {
     formData.append("email", data.email);
     formData.append("stack", data.stack);
     formData.append("position", data.position);
-    formData.append("file", data.file[0]);
+    formData.append("cv", data.file[0]);
+
+    //start loader
+    setIsCreatingCandidate(true);
 
     axios
-      .post(import.meta.env.VITE_API_URL + "/api/candidates/create", formData)
+      .post(import.meta.env.VITE_API_URL + "/api/candidates/create", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).finally(()=>{
+        //stop loader
+        setIsCreatingCandidate(false);
+      })
       .then((res) => {
+        //position not found
+        if(res.data.success.data == null){
+          setCandidateCreateErrorMessage(res.data.success.message);
+          return;
+        }
+
         navigate("/list");
       })
       .catch((err) => {
-        console.log(err.response.data.error.message);
+        console.log("Error :",err.message);
         setCandidateCreateErrorMessage(err.response.data.error.message);
       });
   };
@@ -204,8 +221,12 @@ function AddCandidatePage() {
                 </button>
               </div>
             </form>
-            <div className="cv-error-message mt-2">
-              <h3 className="text-center">{candidateCreateErrorMessage}</h3>
+            <div className="d-flex justify-content-center cv-error-message mt-2">
+              {isCreatingCandidate ? <RotatingLines strokeColor="grey"
+                  strokeWidth="5"
+                  animationDuration="0.75"
+                  width="50"
+                  visible={true} /> : <h3 className="text-center">{candidateCreateErrorMessage}</h3>}
             </div>
           </div>
         </div>

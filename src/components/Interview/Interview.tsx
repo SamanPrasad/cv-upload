@@ -1,28 +1,31 @@
-import axios from "axios";
 import ScheduleInterviewButton from "./InterviewDetails/ScheduleInterview/ScheduleInterviewButton";
-import { CandidateContext } from "../../pages/CandidatePage";
-import { useContext, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import CancelInterview from "./InterviewDetails/ManageInterview/CancelInterview";
 import SendEmail from "./InterviewDetails/ManageInterview/SendEmail";
 import InterviewDetails from "./InterviewDetails";
+import interviewStatus from "../../constants";
+import { RotatingLines } from "react-loader-spinner";
 
 interface Props {
-    interviewDetails: {
-        interviewId: string;
-        candidateId: string;
-        accessKey: string;
-        interviewDate: string;
-        startTime: string;
-        status: string;
-    };
+    interviewDetails: InterviewDetails;
     candidateId: string;
-    rescheduledTime: string;
+    setInterviewDetails: Dispatch<SetStateAction<InterviewDetails>>;
 }
 
-function Interview({ interviewDetails, rescheduledTime, candidateId }: Props) {
+interface InterviewDetails {
+    interviewId: string;
+    candidateId: string;
+    accessKey: string;
+    interviewDate: string;
+    startTime: string;
+    status: string;
+}
+
+function Interview({ interviewDetails, candidateId, setInterviewDetails }: Props) {
     //States
-    const [hasInterview, setHasInterview] = useState(Object.keys(interviewDetails).length == 0 ? false : true)
-    const [interviewErrorMessage, setInterviewErrorMessage] = useState("")
+    const [interviewErrorMessage, setInterviewErrorMessage] = useState("");
+    const [interviewErrorClass, setInterviewErrorClass] = useState("");
+    const [isEmailSending, setIsEmailSending] = useState(false);
 
     return (
         <div style={{}} className="p-0">
@@ -39,22 +42,26 @@ function Interview({ interviewDetails, rescheduledTime, candidateId }: Props) {
                                 <div className="cv-divider"></div>
                             </div>
                         </div>
-                        {hasInterview || <div className="row justify-content-center">
+                        {Object.keys(interviewDetails).length == 0 && <div className="row justify-content-center">
                             <ScheduleInterviewButton modalId="scheduleModal">
                                 Schedule Interview
                             </ScheduleInterviewButton>
                         </div>}
-                        {hasInterview && <div className="row">
-                            <InterviewDetails interviewDetails={interviewDetails} rescheduledTime={rescheduledTime} />
+                        {Object.keys(interviewDetails).length > 0 && <div className="row">
+                            <InterviewDetails interviewDetails={interviewDetails} />
                         </div>}
-                        {hasInterview && <div className="row justify-content-center">
-                            <ScheduleInterviewButton modalId="scheduleModal">
+                        {Object.keys(interviewDetails).length > 0 && <div className="row justify-content-center">
+                            {(Number(interviewDetails.status) == interviewStatus.SCHEDULED || Number(interviewDetails.status) == interviewStatus.CANCELED || Number(interviewDetails.status) == interviewStatus.NOT_PARTICIPATED) && <ScheduleInterviewButton modalId="scheduleModal">
                                 Re-schedule Interview
-                            </ScheduleInterviewButton>
-                            <CancelInterview setInterviewErrorMessage={setInterviewErrorMessage} setHasInterview={setHasInterview} interviewId={interviewDetails.interviewId} />
-                            <SendEmail setInterviewErrorMessage={setInterviewErrorMessage} candidateId={candidateId} />
-                            <div className="row cv-error-message mt-2">
-                                <h5 className="text-center">{interviewErrorMessage}</h5>
+                            </ScheduleInterviewButton>}
+                            {Number(interviewDetails.status) == interviewStatus.SCHEDULED && <CancelInterview isEmailSending={isEmailSending} setInterviewErrorClass={setInterviewErrorClass} setInterviewErrorMessage={setInterviewErrorMessage} interviewId={interviewDetails.interviewId} setInterviewDetails={setInterviewDetails} interviewDetails={interviewDetails} />}
+                            {Number(interviewDetails.status) == interviewStatus.SCHEDULED && <SendEmail setIsEmailSending={setIsEmailSending} setInterviewErrorClass={setInterviewErrorClass} setInterviewErrorMessage={setInterviewErrorMessage} candidateId={candidateId} />}
+                            <div className={"row justify-content-center " + interviewErrorClass + " mt-2"}>
+                                {isEmailSending ? <div className="d-flex justify-content-center"><RotatingLines strokeColor="grey"
+                                    strokeWidth="5"
+                                    animationDuration="0.75"
+                                    width="25"
+                                    visible={true} /></div> : <h5 className="text-center">{interviewErrorMessage}</h5>}
                             </div>
                         </div>}
                     </div>

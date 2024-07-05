@@ -11,8 +11,6 @@ import Interview from "../components/Interview/Interview";
 
 interface ContextInterface {
   getCandidateDetails: () => void;
-  setStatus: (val: boolean) => void;
-  status: boolean;
 }
 
 interface CandidateDetailsInf {
@@ -48,8 +46,6 @@ function CandidatePage() {
   const { candidateId } = useParams();
   const redirect = useNavigate();
   const [activePage, setActivePage] = useState(1);
-  const [status, setStatus] = useState(false); //Used for re-fetching data once the schedule is done
-  const [rescheduledTime, setRescheduledTime] = useState("");
 
   const [candidateDetails, setCandidateDetails] = useState({} as CandidateDetailsInf);
   const [interviewDetails, setInterviewDetails] = useState(
@@ -66,10 +62,15 @@ function CandidatePage() {
         import.meta.env.VITE_API_URL + "/api/candidates/delete/" + candidateId
       )
       .then((res) => {
-        console.log(res.data.message);
+        //candidate not found
+        if(res.data.success.data == null){
+          setCandidateErrorMessage(res.data.success.message);
+          return;
+        }
+        
         redirect("/list");
       }).catch(err=>{
-        console.log("Error :", err.response.data.error.message);
+        console.log("Error :", err.message);
         setCandidateErrorMessage(err.response.data.error.message)
       });
   };
@@ -83,14 +84,13 @@ function CandidatePage() {
     axios
       .get(import.meta.env.VITE_API_URL + "/api/candidates/candidate-details/" + candidateId)
       .then((res) => {
-        setCandidateDetails(res.data.success.data[0].candidateDetails);
-        setInterviewDetails(res.data.success.data[0].interviewDetails);
-        setQuestionsList(res.data.success.data[0].questions);
-        console.log(res.data.success.message);
+        setCandidateDetails(res.data.success.data.candidateDetails);
+        setInterviewDetails(res.data.success.data.interviewDetails);
+        setQuestionsList(res.data.success.data.questions);
       })
       .catch((err) => {
-        console.log('Error :', err.response.data.error.message);
-        if (err.response.status == 400) {
+        console.log('Error :', err.message);
+        if (err.response.status == 404) {
           redirect("/page-not-found");
         }
       });
@@ -110,11 +110,11 @@ function CandidatePage() {
   return (
     Object.keys(candidateDetails).length != 0 && (
       <MainLayout>
-        <CandidateContext.Provider value={{ getCandidateDetails, status, setStatus }}>
-          <ScheduleInterviewModal setRescheduledTime={setRescheduledTime} interviewId={interviewDetails.interviewId} modalId="scheduleModal" candidateId={candidateDetails.candidateId} />
+        <CandidateContext.Provider value={{ getCandidateDetails}}>
+          <ScheduleInterviewModal setInterviewDetails={setInterviewDetails} interviewDetails={interviewDetails} interviewId={interviewDetails.interviewId} modalId="scheduleModal" candidateId={candidateDetails.candidateId} />
           <div className="container px-0">
             <CandidateDetails candidateDetails={candidateDetails} />
-            <Interview rescheduledTime={rescheduledTime} interviewDetails={interviewDetails} candidateId={candidateDetails.candidateId}/>
+            <Interview setInterviewDetails={setInterviewDetails} interviewDetails={interviewDetails} candidateId={candidateDetails.candidateId}/>
             <InterviewQuestionsTable questionsList={questionsList} startingIndex={startingValue} endingIndex={endingValue} />
             {questions.length > 0 && (
               <div className="row justify-content-center">
