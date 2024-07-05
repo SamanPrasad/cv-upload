@@ -88,7 +88,7 @@ function CandidateDetails({ candidateDetails }: Props) {
                 type="button"
                 className="btn btn-outline-primary  mt-3 mx-1 pt-0 pb-1 px-5"
               >
-                <a href={candidateDetails?.candidateCvUrl} className="cv-anchor">
+                <a href={candidateDetails?.candidateCvUrl} className="cv-anchor" target="_blank">
                   Download CV
                 </a>
               </button>

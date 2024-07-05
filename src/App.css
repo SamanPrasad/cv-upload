@@ -40,13 +40,6 @@
   color: white !important;
 }
 
-.cv-response-message {
-  display: none;
-}
-.cv-response-message.cv-show {
-  display: block;
-}
-
 .cv-error-message {
   color: rgba(255, 0, 0, 0.774);
 }

@@ -87,13 +87,13 @@ function Row({ candidate, index }: Props) {
         </div>
       </td>
       <td>
-        <a href={candidate.cvUrl} className="cv-anchor btn btn-outline-primary mx-1 py-0">
+        <a href={candidate.cvUrl} className="cv-anchor btn btn-outline-primary mx-1 py-0" target="_blank">
           Download CV
         </a>
         <a
           href={import.meta.env.VITE_BASE_URL + "/view/" + candidate._id}
           className="cv-anchor btn btn-outline-primary mx-1 py-0"
-        >
+          target="_blank">
           View
         </a>
       </td>

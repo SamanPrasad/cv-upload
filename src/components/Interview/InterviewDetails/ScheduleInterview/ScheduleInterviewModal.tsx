@@ -33,7 +33,9 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
     const dateTime = refDateTime.current?.value;
     const temp = dateTime?.split("T");
     if (temp && temp.length == 2) {
-      setIsLoading(true)
+      //start loader
+      setIsLoading(true);
+
       const date = temp[0];
       const time = temp[1];
       let axiosPromise = {} as Promise<AxiosResponse>;
@@ -52,7 +54,7 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
         .then((res) => {
           //Candidate not found
           if (res.data.success.data == null) {
-            setCssClass("cv-show text-danger");
+            setCssClass("text-danger");
             setResponseMessage(res.data.success.message);
             return;
           }
@@ -64,13 +66,13 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
             setResponseMessage("Scheduled Successfully !")
             getCandidateDetails()
           }
-          setCssClass("cv-show text-success");
+          setCssClass("text-success");
           resetInput();
         })
         .catch((err) => {
           console.log("Error :", err.message)
           setResponseMessage(err.response.data.error.message)
-          setCssClass("cv-show text-danger");
+          setCssClass("text-danger");
         });
     }
   };
@@ -82,6 +84,7 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
       interviewDate,
       startTime
     }
+
     return axios.post(import.meta.env.VITE_API_URL + "/api/interviews/schedule", data)
   }
 
@@ -92,8 +95,8 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
       interviewDate,
       startTime
     }
-    return axios.put(import.meta.env.VITE_API_URL + "/api/interviews/reschedule", data)
 
+    return axios.put(import.meta.env.VITE_API_URL + "/api/interviews/reschedule", data)
   }
 
   //Reset Input
@@ -101,6 +104,7 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
     resetInput();
     setCssClass("");
     setResponseMessage("");
+    setIsLoading(false);
   };
 
   const resetInput = () => {
@@ -133,23 +137,21 @@ function ScheduleInterviewModal({ modalId, candidateId, interviewId, setIntervie
               ref={refDateTime}
             />
           </div>
-          <div className={"cv-response-message " + cssClass}>
-            <h5 className="text-center">
+          <div className="d-flex justify-content-center">
               {isLoading ? <RotatingLines
                 strokeColor="grey"
                 strokeWidth="5"
                 animationDuration="0.75"
-                width="40"
+                width="25"
                 visible={true}
-              /> : responseMessage}
-            </h5>
+              /> : <h5 className={"text-center " + cssClass}>{responseMessage}</h5>}
           </div>
           <div className="modal-footer justify-content-center">
             <button
               type="button"
               className="btn btn-secondary rounded-pill w-25"
-              data-bs-dismiss="modal"
-              onClick={cancelInput}
+              data-bs-dismiss={isLoading? "":"modal"}
+              onClick={isLoading? ()=>{}:cancelInput}
             >
               Cancel
             </button>
