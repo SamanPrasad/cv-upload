@@ -84,14 +84,9 @@ function CandidateDetails({ candidateDetails }: Props) {
               </div>
             </div>
             <div className="d-flex justify-content-center">
-              <button
-                type="button"
-                className="btn btn-outline-primary  mt-3 mx-1 pt-0 pb-1 px-5"
-              >
-                <a href={candidateDetails?.candidateCvUrl} className="cv-anchor" target="_blank">
-                  Download CV
-                </a>
-              </button>
+              <a href={candidateDetails?.candidateCvUrl} className="cv-anchor btn btn-outline-primary  mt-3 mx-1 pt-0 pb-1 px-5" target="_blank">
+                Download CV
+              </a>
             </div>
           </div>
         </div>
